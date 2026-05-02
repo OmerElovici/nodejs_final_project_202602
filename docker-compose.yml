@@ -4,8 +4,6 @@ services:
     container_name: cost-manager-db
     ports:
       - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
     healthcheck:
       test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
       interval: 5s
@@ -78,6 +76,3 @@ services:
     depends_on:
       seed-service:
         condition: service_completed_successfully
-
-volumes:
-  mongodb_data:
