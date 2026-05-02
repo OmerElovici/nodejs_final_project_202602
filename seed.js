@@ -24,7 +24,7 @@ const seedDB = async () => {
   
   await user.save();
   
-  console.log('Database seeded successfully. All data cleared except for the required user (123123).');
+  console.log('Database seeded successfully.');
   process.exit(0);
 };
 
