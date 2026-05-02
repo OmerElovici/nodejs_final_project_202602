@@ -15,7 +15,7 @@ app.use(loggerMiddleware);
 app.get('/api/about', (req, res) => {
   try {
     const teamMembers = [
-      { first_name: 'Omer', last_name: 'Elovich' },
+      { first_name: 'Omer', last_name: 'Elovici' },
       { first_name: 'David', last_name: 'Yakhin' }
     ];
     res.json(teamMembers);
