@@ -138,6 +138,21 @@ describe('Cost Manager API - Comprehensive Tests', () => {
       expect(res.body.id).toEqual('error');
     });
 
+    it('should fail to add a cost with a past date', async () => {
+      const res = await request(costsApp)
+        .post('/api/add')
+        .send({
+          description: 'old milk',
+          category: 'food',
+          userid: 123123,
+          sum: 8,
+          createdAt: '2000-01-01T00:00:00Z'
+        });
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.id).toEqual('error');
+      expect(res.body.message).toEqual('Cannot add costs with dates in the past');
+    });
+
     it('should add a cost item successfully', async () => {
       const res = await request(costsApp)
         .post('/api/add')

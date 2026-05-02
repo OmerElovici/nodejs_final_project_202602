@@ -30,9 +30,13 @@ app.post('/api/add', async (req, res) => {
     if (createdAt) {
       costDate = new Date(createdAt);
       const currentDate = new Date();
-      // Allow a small buffer (e.g., 1 day) or just check month/year to be safe, 
-      // but strictly speaking, past means before today.
-      // For simplicity, we just use the provided date.
+      currentDate.setHours(0, 0, 0, 0);
+      const checkDate = new Date(costDate);
+      checkDate.setHours(0, 0, 0, 0);
+      
+      if (checkDate < currentDate) {
+        return res.status(400).json({ id: 'error', message: 'Cannot add costs with dates in the past' });
+      }
     }
     
     const newCost = new Cost({ description, category, userid, sum, createdAt: costDate });
