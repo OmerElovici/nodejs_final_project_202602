@@ -38,7 +38,7 @@
             <div class="card">
                 <h2>Costs Service (Port 3003)</h2>
                 
-                <h3>Add Cost Item</h3>
+                <h3>Add Purchase</h3>
                 <form id="addCostForm">
                     <input type="number" id="costUserId" placeholder="User ID" required>
                     <input type="text" id="costDesc" placeholder="Description" required>
@@ -50,8 +50,11 @@
                         <option value="education">Education</option>
                     </select>
                     <input type="number" id="costSum" placeholder="Sum" required>
-                    <button type="submit">Add Cost</button>
+                    <button type="submit">Add Purchase</button>
                 </form>
+
+                <h3>List All Purchases</h3>
+                <button id="listCostsBtn">Get All Purchases</button>
 
                 <h3>Get Monthly Report</h3>
                 <form id="getReportForm">
@@ -60,9 +63,6 @@
                     <input type="number" id="reportMonth" placeholder="Month (1-12)" required>
                     <button type="submit">Get Report</button>
                 </form>
-
-                <h3>List All Costs</h3>
-                <button id="listCostsBtn">Get All Costs</button>
 
                 <h3>List All Reports</h3>
                 <button id="listReportsBtn">Get All Reports</button>
