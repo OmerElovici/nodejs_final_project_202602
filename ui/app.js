@@ -76,6 +76,14 @@ document.getElementById('getReportForm').addEventListener('submit', (e) => {
     makeRequest(`${BASE_URLS.costs}/api/report?id=${id}&year=${year}&month=${month}`);
 });
 
+document.getElementById('listCostsBtn').addEventListener('click', () => {
+    makeRequest(`${BASE_URLS.costs}/api/costs`);
+});
+
+document.getElementById('listReportsBtn').addEventListener('click', () => {
+    makeRequest(`${BASE_URLS.costs}/api/reports`);
+});
+
 // Logs Service
 document.getElementById('getLogsBtn').addEventListener('click', () => {
     makeRequest(`${BASE_URLS.logs}/api/logs`);

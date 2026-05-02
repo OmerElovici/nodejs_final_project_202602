@@ -111,6 +111,32 @@ app.get('/api/report', async (req, res) => {
   }
 });
 
+/*
+ * GET /api/costs
+ * Returns a list of all costs.
+ */
+app.get('/api/costs', async (req, res) => {
+  try {
+    const costs = await Cost.find({});
+    res.json(costs);
+  } catch (error) {
+    res.status(500).json({ id: 'error', message: error.message });
+  }
+});
+
+/*
+ * GET /api/reports
+ * Returns a list of all cached reports.
+ */
+app.get('/api/reports', async (req, res) => {
+  try {
+    const reports = await Report.find({});
+    res.json(reports);
+  } catch (error) {
+    res.status(500).json({ id: 'error', message: error.message });
+  }
+});
+
 const PORT = process.env.COSTS_PORT || 3003;
 if (require.main === module) {
   connectDB().then(() => {
