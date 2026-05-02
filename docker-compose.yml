@@ -1,0 +1,55 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: cost-manager-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  logs-service:
+    build: .
+    container_name: logs-service
+    command: node logs-service.js
+    ports:
+      - "3001:3001"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/cost-manager
+    depends_on:
+      - mongodb
+
+  users-service:
+    build: .
+    container_name: users-service
+    command: node users-service.js
+    ports:
+      - "3002:3002"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/cost-manager
+    depends_on:
+      - mongodb
+
+  costs-service:
+    build: .
+    container_name: costs-service
+    command: node costs-service.js
+    ports:
+      - "3003:3003"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/cost-manager
+    depends_on:
+      - mongodb
+
+  about-service:
+    build: .
+    container_name: about-service
+    command: node about-service.js
+    ports:
+      - "3004:3004"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/cost-manager
+    depends_on:
+      - mongodb
+
+volumes:
+  mongodb_data:
