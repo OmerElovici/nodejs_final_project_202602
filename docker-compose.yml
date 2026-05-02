@@ -6,6 +6,21 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  seed-service:
+    build: .
+    container_name: seed-service
+    command: node seed.js
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/cost-manager
+    depends_on:
+      mongodb:
+        condition: service_healthy
 
   logs-service:
     build: .
@@ -16,7 +31,8 @@ services:
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/cost-manager
     depends_on:
-      - mongodb
+      seed-service:
+        condition: service_completed_successfully
 
   users-service:
     build: .
@@ -27,7 +43,8 @@ services:
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/cost-manager
     depends_on:
-      - mongodb
+      seed-service:
+        condition: service_completed_successfully
 
   costs-service:
     build: .
@@ -38,7 +55,8 @@ services:
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/cost-manager
     depends_on:
-      - mongodb
+      seed-service:
+        condition: service_completed_successfully
 
   about-service:
     build: .
@@ -49,7 +67,8 @@ services:
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/cost-manager
     depends_on:
-      - mongodb
+      seed-service:
+        condition: service_completed_successfully
 
 volumes:
   mongodb_data:
