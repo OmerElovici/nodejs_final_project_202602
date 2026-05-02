@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Manager API Tester</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Cost Manager API Tester</h1>
+        
+        <div class="grid">
+            <!-- Users Service -->
+            <div class="card">
+                <h2>Users Service (Port 3002)</h2>
+                
+                <h3>Add User</h3>
+                <form id="addUserForm">
+                    <input type="number" id="userId" placeholder="ID" required>
+                    <input type="text" id="userFirstName" placeholder="First Name" required>
+                    <input type="text" id="userLastName" placeholder="Last Name" required>
+                    <input type="date" id="userBirthday" required>
+                    <button type="submit">Add User</button>
+                </form>
+
+                <h3>Get User Details</h3>
+                <form id="getUserForm">
+                    <input type="number" id="getUserId" placeholder="User ID" required>
+                    <button type="submit">Get User</button>
+                </form>
+
+                <h3>List All Users</h3>
+                <button id="listUsersBtn">Get All Users</button>
+            </div>
+
+            <!-- Costs Service -->
+            <div class="card">
+                <h2>Costs Service (Port 3003)</h2>
+                
+                <h3>Add Cost Item</h3>
+                <form id="addCostForm">
+                    <input type="number" id="costUserId" placeholder="User ID" required>
+                    <input type="text" id="costDesc" placeholder="Description" required>
+                    <select id="costCategory" required>
+                        <option value="food">Food</option>
+                        <option value="health">Health</option>
+                        <option value="housing">Housing</option>
+                        <option value="sports">Sports</option>
+                        <option value="education">Education</option>
+                    </select>
+                    <input type="number" id="costSum" placeholder="Sum" required>
+                    <button type="submit">Add Cost</button>
+                </form>
+
+                <h3>Get Monthly Report</h3>
+                <form id="getReportForm">
+                    <input type="number" id="reportUserId" placeholder="User ID" required>
+                    <input type="number" id="reportYear" placeholder="Year (e.g. 2026)" required>
+                    <input type="number" id="reportMonth" placeholder="Month (1-12)" required>
+                    <button type="submit">Get Report</button>
+                </form>
+            </div>
+
+            <!-- Logs & About Services -->
+            <div class="card">
+                <h2>Logs Service (Port 3001)</h2>
+                <button id="getLogsBtn">Get All Logs</button>
+
+                <h2 style="margin-top: 2rem;">About Service (Port 3004)</h2>
+                <button id="getAboutBtn">Get Team Details</button>
+            </div>
+        </div>
+
+        <div class="response-container">
+            <h2>Response</h2>
+            <pre id="responseOutput">Response will appear here...</pre>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

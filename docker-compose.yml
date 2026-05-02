@@ -70,5 +70,14 @@ services:
       seed-service:
         condition: service_completed_successfully
 
+  ui:
+    build: ./ui
+    container_name: cost-manager-ui
+    ports:
+      - "8080:80"
+    depends_on:
+      seed-service:
+        condition: service_completed_successfully
+
 volumes:
   mongodb_data:

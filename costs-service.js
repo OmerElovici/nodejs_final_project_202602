@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const connectDB = require('./db');
 const { loggerMiddleware } = require('./logger');
 const Cost = require('./models/cost');
@@ -6,6 +7,7 @@ const User = require('./models/user');
 const Report = require('./models/report');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(loggerMiddleware);
 

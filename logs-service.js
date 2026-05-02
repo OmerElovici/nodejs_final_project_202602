@@ -1,9 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const connectDB = require('./db');
 const { loggerMiddleware } = require('./logger');
 const Log = require('./models/log');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(loggerMiddleware);
 
