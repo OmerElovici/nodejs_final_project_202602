@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 
-/*
+/**
  * Report Schema
- * Implements the Computed Design Pattern by caching monthly reports.
+ * Defines the structure for cached monthly reports (Computed Design Pattern).
+ * @type {mongoose.Schema}
  */
 const reportSchema = new mongoose.Schema({
-  userid: {
+  userId: {
     type: Number,
     required: true
   },
@@ -23,7 +24,11 @@ const reportSchema = new mongoose.Schema({
   }
 });
 
-// Create the model
+/**
+ * Report Model
+ * Mongoose model used to interact with the 'reports' collection.
+ * @type {mongoose.Model}
+ */
 const Report = mongoose.model('Report', reportSchema);
 
 module.exports = Report;

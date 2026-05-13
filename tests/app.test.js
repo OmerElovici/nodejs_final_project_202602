@@ -28,13 +28,13 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .post('/api/add')
         .send({
           id: 123123,
-          first_name: 'mosh',
-          last_name: 'israeli',
+          firstName: 'mosh',
+          lastName: 'israeli',
           birthday: '1990-01-01'
         });
       expect(res.statusCode).toEqual(200);
       expect(res.body.id).toEqual(123123);
-      expect(res.body.first_name).toEqual('mosh');
+      expect(res.body.firstName).toEqual('mosh');
     });
 
     it('should fail to add a user with missing fields', async () => {
@@ -42,7 +42,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .post('/api/add')
         .send({
           id: 999999,
-          first_name: 'incomplete'
+          firstName: 'incomplete'
         });
       expect(res.statusCode).toEqual(400);
       expect(res.body.id).toEqual('error');
@@ -53,8 +53,8 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .post('/api/add')
         .send({
           id: 123123,
-          first_name: 'duplicate',
-          last_name: 'user',
+          firstName: 'duplicate',
+          lastName: 'user',
           birthday: '1990-01-01'
         });
       expect(res.statusCode).toEqual(400);
@@ -66,8 +66,8 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .post('/api/add')
         .send({
           id: 'not-a-number',
-          first_name: 'invalid',
-          last_name: 'user',
+          firstName: 'invalid',
+          lastName: 'user',
           birthday: '1990-01-01'
         });
       expect(res.statusCode).toEqual(400);
@@ -105,7 +105,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .send({
           description: 'ghost milk',
           category: 'food',
-          userid: 999999,
+          userId: 999999,
           sum: 10
         });
       expect(res.statusCode).toEqual(400);
@@ -118,7 +118,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .post('/api/add')
         .send({
           category: 'food',
-          userid: 123123,
+          userId: 123123,
           sum: 8
         });
       expect(res.statusCode).toEqual(400);
@@ -131,7 +131,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .send({
           description: 'gas',
           category: 'car',
-          userid: 123123,
+          userId: 123123,
           sum: 50
         });
       expect(res.statusCode).toEqual(400);
@@ -144,7 +144,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .send({
           description: 'old milk',
           category: 'food',
-          userid: 123123,
+          userId: 123123,
           sum: 8,
           createdAt: '2000-01-01T00:00:00Z'
         });
@@ -159,7 +159,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .send({
           description: 'milk',
           category: 'food',
-          userid: 123123,
+          userId: 123123,
           sum: 8
         });
       expect(res.statusCode).toEqual(200);
@@ -173,7 +173,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .send({
           description: 'bread',
           category: 'food',
-          userid: 123123,
+          userId: 123123,
           sum: 12
         });
       expect(res.statusCode).toEqual(200);
@@ -201,7 +201,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .get(`/api/report?id=123123&year=${currentYear}&month=${currentMonth}`);
       
       expect(res.statusCode).toEqual(200);
-      expect(res.body.userid).toEqual(123123);
+      expect(res.body.userId).toEqual(123123);
       expect(res.body.year).toEqual(currentYear);
       expect(res.body.month).toEqual(currentMonth);
       
@@ -245,10 +245,10 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .get('/api/about');
       expect(res.statusCode).toEqual(200);
       expect(Array.isArray(res.body)).toBeTruthy();
-      expect(res.body[0].first_name).toEqual('Omer');
-      expect(res.body[0].last_name).toEqual('Elovici');
-      expect(res.body[1].first_name).toEqual('David');
-      expect(res.body[1].last_name).toEqual('Yakhin');
+      expect(res.body[0].firstName).toEqual('Omer');
+      expect(res.body[0].lastName).toEqual('Elovici');
+      expect(res.body[1].firstName).toEqual('David');
+      expect(res.body[1].lastName).toEqual('Yakhin');
     });
   });
 });

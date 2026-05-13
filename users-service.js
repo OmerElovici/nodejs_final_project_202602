@@ -10,58 +10,73 @@ app.use(cors());
 app.use(express.json());
 app.use(loggerMiddleware);
 
-/*
+/**
  * POST /api/add
- * Adds a new user.
+ * Adds a new user to the system.
+ * @name add-user
+ * @function
+ * @param {Object} request - Express request object.
+ * @param {Object} response - Express response object.
  */
-app.post('/api/add', async (req, res) => {
+app.post('/api/add', async (request, response) => {
   try {
-    const { id, first_name, last_name, birthday } = req.body;
-    const newUser = new User({ id, first_name, last_name, birthday });
+    const { id, firstName, lastName, birthday } = request.body;
+    
+    const newUser = new User({ id, firstName, lastName, birthday });
     await newUser.save();
-    res.json(newUser);
-  } catch (error) {
-    res.status(400).json({ id: 'error', message: error.message });
+    
+    response.json(newUser);
+  } catch (serviceError) {
+    response.status(400).json({ id: 'error', message: serviceError.message });
   }
 });
 
-/*
+/**
  * GET /api/users/:id
- * Returns details of a specific user including total costs.
+ * Retrieves details of a specific user and calculates their total costs.
+ * @name get-user-details
+ * @function
+ * @param {Object} request - Express request object.
+ * @param {Object} response - Express response object.
  */
-app.get('/api/users/:id', async (req, res) => {
+app.get('/api/users/:id', async (request, response) => {
   try {
-    const userId = Number(req.params.id);
-    const user = await User.findOne({ id: userId });
-    if (!user) {
-      return res.status(404).json({ id: 'error', message: 'User not found' });
+    const userId = Number(request.params.id);
+    const userRecord = await User.findOne({ id: userId });
+    
+    if (!userRecord) {
+      return response.status(404).json({ id: 'error', message: 'User not found' });
     }
     
-    // Calculate total costs
-    const costs = await Cost.find({ userid: userId });
-    const total = costs.reduce((sum, cost) => sum + cost.sum, 0);
+    const userCosts = await Cost.find({ userId: userId });
+    const totalSpent = userCosts.reduce((total, currentCost) => total + currentCost.sum, 0);
     
-    res.json({
-      first_name: user.first_name,
-      last_name: user.last_name,
-      id: user.id,
-      total: total
+    response.json({
+      firstName: userRecord.firstName,
+      lastName: userRecord.lastName,
+      id: userRecord.id,
+      total: totalSpent
     });
-  } catch (error) {
-    res.status(500).json({ id: 'error', message: error.message });
+  } catch (serviceError) {
+    response.status(500).json({ id: 'error', message: serviceError.message });
   }
 });
 
-/*
+/**
  * GET /api/users
- * Returns a list of all users.
+ * Returns a list of all registered users.
+ * @name list-users
+ * @function
+ * @param {Object} request - Express request object.
+ * @param {Object} response - Express response object.
  */
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', async (request, response) => {
   try {
-    const users = await User.find({});
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ id: 'error', message: error.message });
+    const allUsers = await User.find({});
+    
+    response.json(allUsers);
+  } catch (serviceError) {
+    response.status(500).json({ id: 'error', message: serviceError.message });
   }
 });
 

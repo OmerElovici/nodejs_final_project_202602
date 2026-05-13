@@ -11,133 +11,146 @@ app.use(cors());
 app.use(express.json());
 app.use(loggerMiddleware);
 
-/*
+/**
  * POST /api/add
- * Adds a new cost item.
+ * Adds a new cost record for a user.
+ * @name add-cost
+ * @function
+ * @param {Object} request - Express request object.
+ * @param {Object} response - Express response object.
  */
-app.post('/api/add', async (req, res) => {
+app.post('/api/add', async (request, response) => {
   try {
-    const { description, category, userid, sum, createdAt } = req.body;
+    const { description, category, userId, sum, createdAt } = request.body;
     
-    // Check if user exists
-    const user = await User.findOne({ id: userid });
-    if (!user) {
-      return res.status(400).json({ id: 'error', message: 'User does not exist' });
+    const targetUser = await User.findOne({ id: userId });
+    if (!targetUser) {
+      return response.status(400).json({ id: 'error', message: 'User does not exist' });
     }
     
-    // Prevent adding costs with dates in the past if createdAt is provided
-    let costDate = new Date();
+    let costTimestamp = new Date();
     if (createdAt) {
-      costDate = new Date(createdAt);
-      const currentDate = new Date();
-      currentDate.setHours(0, 0, 0, 0);
-      const checkDate = new Date(costDate);
-      checkDate.setHours(0, 0, 0, 0);
+      costTimestamp = new Date(createdAt);
+      const normalizedCurrentDate = new Date();
+      normalizedCurrentDate.setHours(0, 0, 0, 0);
+      const normalizedCheckDate = new Date(costTimestamp);
+      normalizedCheckDate.setHours(0, 0, 0, 0);
       
-      if (checkDate < currentDate) {
-        return res.status(400).json({ id: 'error', message: 'Cannot add costs with dates in the past' });
+      // Validation: Prevent backdating costs before today
+      if (normalizedCheckDate < normalizedCurrentDate) {
+        return response.status(400).json({ id: 'error', message: 'Cannot add costs with dates in the past' });
       }
     }
     
-    const newCost = new Cost({ description, category, userid, sum, createdAt: costDate });
-    await newCost.save();
-    res.json(newCost);
-  } catch (error) {
-    res.status(400).json({ id: 'error', message: error.message });
+    const newCostEntry = new Cost({ description, category, userId, sum, createdAt: costTimestamp });
+    await newCostEntry.save();
+    
+    response.json(newCostEntry);
+  } catch (serviceError) {
+    response.status(400).json({ id: 'error', message: serviceError.message });
   }
 });
 
-/*
+/**
  * GET /api/report
- * Returns a monthly report for a user. Implements Computed Design Pattern.
+ * Generates a monthly cost report using the Computed Design Pattern.
+ * @name get-monthly-report
+ * @function
+ * @param {Object} request - Express request object.
+ * @param {Object} response - Express response object.
  */
-app.get('/api/report', async (req, res) => {
+app.get('/api/report', async (request, response) => {
   try {
-    const { id, year, month } = req.query;
-    const userId = Number(id);
+    const { id, year, month } = request.query;
+    const targetUserId = Number(id);
     const reportYear = Number(year);
     const reportMonth = Number(month);
     
-    // Check if report already exists in the computed collection
-    const existingReport = await Report.findOne({ userid: userId, year: reportYear, month: reportMonth });
-    if (existingReport) {
-      return res.json({
-        userid: userId,
+    // Check if the report has already been computed and cached
+    const cachedReport = await Report.findOne({ userId: targetUserId, year: reportYear, month: reportMonth });
+    if (cachedReport) {
+      return response.json({
+        userId: targetUserId,
         year: reportYear,
         month: reportMonth,
-        costs: existingReport.costs
+        costs: cachedReport.costs
       });
     }
     
-    // Calculate start and end dates for the requested month
-    const startDate = new Date(reportYear, reportMonth - 1, 1);
-    const endDate = new Date(reportYear, reportMonth, 1);
+    const startRange = new Date(reportYear, reportMonth - 1, 1);
+    const endRange = new Date(reportYear, reportMonth, 1);
     
-    // Fetch costs for the user in the specified month
-    const costs = await Cost.find({
-      userid: userId,
-      createdAt: { $gte: startDate, $lt: endDate }
+    const monthlyCosts = await Cost.find({
+      userId: targetUserId,
+      createdAt: { $gte: startRange, $lt: endRange }
     });
     
-    // Group costs by category
-    const categories = ['food', 'health', 'housing', 'sports', 'education'];
-    const groupedCosts = categories.map(cat => {
-      const catCosts = costs
-        .filter(c => c.category === cat)
-        .map(c => ({
-          sum: c.sum,
-          description: c.description,
-          day: c.createdAt.getDate()
+    const validCategories = ['food', 'health', 'housing', 'sports', 'education'];
+    const categorizedCosts = validCategories.map(currentCategory => {
+      const filteredCosts = monthlyCosts
+        .filter(costItem => costItem.category === currentCategory)
+        .map(costItem => ({
+          sum: costItem.sum,
+          description: costItem.description,
+          day: costItem.createdAt.getDate()
         }));
-      return { [cat]: catCosts };
+      return { [currentCategory]: filteredCosts };
     });
     
-    const reportData = {
-      userid: userId,
+    const generatedReport = {
+      userId: targetUserId,
       year: reportYear,
       month: reportMonth,
-      costs: groupedCosts
+      costs: categorizedCosts
     };
     
-    // If the requested month has already passed, save the report (Computed Design Pattern)
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1;
+    // Cache the report if the month is already in the past
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
     
     if (reportYear < currentYear || (reportYear === currentYear && reportMonth < currentMonth)) {
-      const newReport = new Report(reportData);
-      await newReport.save();
+      const persistentReport = new Report(generatedReport);
+      await persistentReport.save();
     }
     
-    res.json(reportData);
-  } catch (error) {
-    res.status(500).json({ id: 'error', message: error.message });
+    response.json(generatedReport);
+  } catch (serviceError) {
+    response.status(500).json({ id: 'error', message: serviceError.message });
   }
 });
 
-/*
+/**
  * GET /api/costs
- * Returns a list of all costs.
+ * Retrieves a full history of all cost transactions.
+ * @name list-all-costs
+ * @function
+ * @param {Object} request - Express request object.
+ * @param {Object} response - Express response object.
  */
-app.get('/api/costs', async (req, res) => {
+app.get('/api/costs', async (request, response) => {
   try {
-    const costs = await Cost.find({});
-    res.json(costs);
-  } catch (error) {
-    res.status(500).json({ id: 'error', message: error.message });
+    const globalCosts = await Cost.find({});
+    response.json(globalCosts);
+  } catch (serviceError) {
+    response.status(500).json({ id: 'error', message: serviceError.message });
   }
 });
 
-/*
+/**
  * GET /api/reports
- * Returns a list of all cached reports.
+ * Returns all cached reports stored in the system.
+ * @name list-cached-reports
+ * @function
+ * @param {Object} request - Express request object.
+ * @param {Object} response - Express response object.
  */
-app.get('/api/reports', async (req, res) => {
+app.get('/api/reports', async (request, response) => {
   try {
-    const reports = await Report.find({});
-    res.json(reports);
-  } catch (error) {
-    res.status(500).json({ id: 'error', message: error.message });
+    const allCachedReports = await Report.find({});
+    response.json(allCachedReports);
+  } catch (serviceError) {
+    response.status(500).json({ id: 'error', message: serviceError.message });
   }
 });
 

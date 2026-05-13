@@ -2,25 +2,31 @@ const pino = require('pino');
 const pinoHttp = require('pino-http');
 const Log = require('./models/log');
 
-/*
- * Custom Pino stream to write logs to MongoDB using Mongoose.
+/**
+ * Custom Pino stream that redirects log messages to a MongoDB database.
+ * Implements the 'write' method required by Pino streams.
+ * @type {Object}
  */
 const streamToMongoDB = {
-  write: (msg) => {
+  /**
+   * Writes a log message to the database.
+   * @param {string} logMessage - The raw string log message from Pino.
+   */
+  write: (logMessage) => {
     try {
-      const logEntry = JSON.parse(msg);
-      // Save log to MongoDB
-      Log.create(logEntry).catch(err => console.error('Failed to save log to DB:', err));
-    } catch (err) {
-      console.error('Failed to parse log message:', err);
+      const logData = JSON.parse(logMessage);
+      
+      Log.create(logData).catch(persistenceError => {
+        console.error('Failed to save log to DB:', persistenceError);
+      });
+    } catch (parseError) {
+      console.error('Failed to parse log message:', parseError);
     }
   }
 };
 
-// Create Pino logger instance
 const logger = pino({}, streamToMongoDB);
 
-// Create Pino HTTP middleware
 const loggerMiddleware = pinoHttp({ logger });
 
 module.exports = { logger, loggerMiddleware };

@@ -5,27 +5,33 @@ const Cost = require('./models/cost');
 const Log = require('./models/log');
 const Report = require('./models/report');
 
-const seedDB = async () => {
+/**
+ * Seeds the database with initial data for development and testing.
+ * Clears existing data and adds the mandatory default user.
+ * @async
+ * @function seedDatabase
+ * @returns {Promise<void>}
+ */
+const seedDatabase = async () => {
   await connectDB();
   
-  // Clear all collections
   await User.deleteMany({});
   await Cost.deleteMany({});
   await Log.deleteMany({});
   await Report.deleteMany({});
   
-  // Add ONLY the single required imaginary user
-  const user = new User({
+  const defaultUser = new User({
     id: 123123,
-    first_name: 'mosh',
-    last_name: 'israeli',
+    firstName: 'mosh',
+    lastName: 'israeli',
     birthday: new Date('1990-01-01')
   });
   
-  await user.save();
+  await defaultUser.save();
   
   console.log('Database seeded successfully.');
+  
   process.exit(0);
 };
 
-seedDB();
+seedDatabase();

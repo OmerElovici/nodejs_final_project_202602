@@ -9,16 +9,21 @@ app.use(cors());
 app.use(express.json());
 app.use(loggerMiddleware);
 
-/*
+/**
  * GET /api/logs
- * Returns a JSON document describing all logs.
+ * Retrieves all application logs from the database.
+ * @name list-logs
+ * @function
+ * @param {Object} request - Express request object.
+ * @param {Object} response - Express response object.
  */
-app.get('/api/logs', async (req, res) => {
+app.get('/api/logs', async (request, response) => {
   try {
-    const logs = await Log.find({});
-    res.json(logs);
-  } catch (error) {
-    res.status(500).json({ id: 'error', message: error.message });
+    const allLogEntries = await Log.find({});
+    
+    response.json(allLogEntries);
+  } catch (serviceError) {
+    response.status(500).json({ id: 'error', message: serviceError.message });
   }
 });
 

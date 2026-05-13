@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
-/*
+/**
  * Cost Schema
- * Represents a cost item added by a user.
+ * Defines the structure for an individual cost transaction record.
+ * @type {mongoose.Schema}
  */
 const costSchema = new mongoose.Schema({
   description: {
@@ -14,7 +15,7 @@ const costSchema = new mongoose.Schema({
     required: true,
     enum: ['food', 'health', 'housing', 'sports', 'education']
   },
-  userid: {
+  userId: {
     type: Number,
     required: true
   },
@@ -28,7 +29,11 @@ const costSchema = new mongoose.Schema({
   }
 });
 
-// Create the model
+/**
+ * Cost Model
+ * Mongoose model used to interact with the 'costs' collection.
+ * @type {mongoose.Model}
+ */
 const Cost = mongoose.model('Cost', costSchema);
 
 module.exports = Cost;

@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
-/*
+/**
  * User Schema
- * Represents a user in the system.
+ * Defines the structure for a user record in the database.
+ * @type {mongoose.Schema}
  */
 const userSchema = new mongoose.Schema({
   id: {
@@ -10,11 +11,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  first_name: {
+  firstName: {
     type: String,
     required: true
   },
-  last_name: {
+  lastName: {
     type: String,
     required: true
   },
@@ -24,7 +25,11 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// Create the model
+/**
+ * User Model
+ * Mongoose model used to interact with the 'users' collection.
+ * @type {mongoose.Model}
+ */
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

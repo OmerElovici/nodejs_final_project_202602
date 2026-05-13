@@ -8,19 +8,24 @@ app.use(cors());
 app.use(express.json());
 app.use(loggerMiddleware);
 
-/*
+/**
  * GET /api/about
- * Returns a JSON document describing the team members.
+ * Returns a list of team members who developed the project.
+ * @name get-team-details
+ * @function
+ * @param {Object} request - Express request object.
+ * @param {Object} response - Express response object.
  */
-app.get('/api/about', (req, res) => {
+app.get('/api/about', (request, response) => {
   try {
-    const teamMembers = [
-      { first_name: 'Omer', last_name: 'Elovici' },
-      { first_name: 'David', last_name: 'Yakhin' }
+    const developmentTeam = [
+      { firstName: 'Omer', lastName: 'Elovici' },
+      { firstName: 'David', lastName: 'Yakhin' }
     ];
-    res.json(teamMembers);
-  } catch (error) {
-    res.status(500).json({ id: 'error', message: error.message });
+    
+    response.json(developmentTeam);
+  } catch (serviceError) {
+    response.status(500).json({ id: 'error', message: serviceError.message });
   }
 });
 
