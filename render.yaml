@@ -14,8 +14,16 @@ services:
     dockerCommand: "node seed.js && node users_service.js"
     plan: free
     envVars:
-      - key: MONGODB_URI
-        value: "mongodb://mongodb:27017/cost-manager"
+      - key: MONGODB_HOST
+        fromService:
+          type: web
+          name: mongodb
+          property: host
+      - key: MONGODB_PORT
+        fromService:
+          type: web
+          name: mongodb
+          property: port
 
   # 3. Logs Microservice
   - type: web
@@ -24,8 +32,16 @@ services:
     dockerCommand: "node logs_service.js"
     plan: free
     envVars:
-      - key: MONGODB_URI
-        value: "mongodb://mongodb:27017/cost-manager"
+      - key: MONGODB_HOST
+        fromService:
+          type: web
+          name: mongodb
+          property: host
+      - key: MONGODB_PORT
+        fromService:
+          type: web
+          name: mongodb
+          property: port
 
   # 4. Costs Microservice
   - type: web
@@ -34,8 +50,16 @@ services:
     dockerCommand: "node costs_service.js"
     plan: free
     envVars:
-      - key: MONGODB_URI
-        value: "mongodb://mongodb:27017/cost-manager"
+      - key: MONGODB_HOST
+        fromService:
+          type: web
+          name: mongodb
+          property: host
+      - key: MONGODB_PORT
+        fromService:
+          type: web
+          name: mongodb
+          property: port
 
   # 5. About Microservice
   - type: web
@@ -44,8 +68,16 @@ services:
     dockerCommand: "node about_service.js"
     plan: free
     envVars:
-      - key: MONGODB_URI
-        value: "mongodb://mongodb:27017/cost-manager"
+      - key: MONGODB_HOST
+        fromService:
+          type: web
+          name: mongodb
+          property: host
+      - key: MONGODB_PORT
+        fromService:
+          type: web
+          name: mongodb
+          property: port
 
   # 6. Nginx-based Frontend UI
   - type: web

@@ -10,7 +10,9 @@ require('dotenv').config();
  */
 const connectDB = async () => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/cost-manager';
+    const mongoHost = process.env.MONGODB_HOST || 'localhost';
+    const mongoPort = process.env.MONGODB_PORT || '27017';
+    const mongoUri = process.env.MONGODB_URI || `mongodb://${mongoHost}:${mongoPort}/cost-manager`;
     await mongoose.connect(mongoUri);
     console.log('MongoDB connected successfully');
 
