@@ -1,10 +1,10 @@
 services:
-  # 1. Ephemeral MongoDB (Web Service for external access/debug)
+  # 1. Ephemeral MongoDB (Web Service from prebuilt image)
   - type: web
     name: mongodb
     runtime: image
-    image: "mongo:4.4"
-    port: 27017
+    image:
+      url: "mongo:4.4"
     plan: free
 
   # 2. Users Microservice (Seeds the DB automatically on start!)
