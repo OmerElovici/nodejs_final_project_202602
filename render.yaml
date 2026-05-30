@@ -1,9 +1,10 @@
 services:
-  # 1. Ephemeral MongoDB (No Persistent Disk)
-  - type: pserv
+  # 1. Ephemeral MongoDB (Web Service for external access/debug)
+  - type: web
     name: mongodb
     runtime: image
     image: "mongo:4.4"
+    port: 27017
     plan: free
 
   # 2. Users Microservice (Seeds the DB automatically on start!)
