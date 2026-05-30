@@ -18,9 +18,37 @@ app.use(loggerMiddleware);
  * @param {Object} request - Express request object.
  * @param {Object} response - Express response object.
  */
+/**
+ * Normalizes request body keys for user creation, supporting camelCase, kebab-case, snake_case, lowercase, and uppercase.
+ * @param {Object} body - The raw request body.
+ * @returns {Object} The normalized body.
+ */
+const normalizeUserBody = (body) => {
+  if (!body || typeof body !== 'object') return body;
+  
+  const normalized = {};
+  for (const key of Object.keys(body)) {
+    const lowerKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    if (lowerKey === 'id' || lowerKey === 'userid') {
+      normalized.id = body[key];
+    } else if (lowerKey === 'firstname' || lowerKey === 'first') {
+      normalized.firstName = body[key];
+    } else if (lowerKey === 'lastname' || lowerKey === 'last') {
+      normalized.lastName = body[key];
+    } else if (lowerKey === 'birthday' || lowerKey === 'birthdate' || lowerKey === 'birth') {
+      normalized.birthday = body[key];
+    } else {
+      normalized[key] = body[key];
+    }
+  }
+  return normalized;
+};
+
 app.post('/api/add', async (request, response) => {
   try {
-    const { id, firstName, lastName, birthday } = request.body;
+    const normalizedBody = normalizeUserBody(request.body);
+    const { id, firstName, lastName, birthday } = normalizedBody;
     
     const newUser = new User({ id, firstName, lastName, birthday });
     await newUser.save();

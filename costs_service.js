@@ -19,12 +19,41 @@ app.use(loggerMiddleware);
  * @param {Object} request - Express request object.
  * @param {Object} response - Express response object.
  */
+/**
+ * Normalizes request body keys to camelCase, supporting camelCase, kebab-case, snake_case, lowercase, and uppercase.
+ * @param {Object} body - The raw request body.
+ * @returns {Object} The normalized body.
+ */
+const normalizeRequestBody = (body) => {
+  if (!body || typeof body !== 'object') return body;
+  
+  const normalized = {};
+  for (const key of Object.keys(body)) {
+    const lowerKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    if (lowerKey === 'userid' || lowerKey === 'id') {
+      normalized.userId = body[key];
+    } else if (lowerKey === 'description' || lowerKey === 'desc') {
+      normalized.description = body[key];
+    } else if (lowerKey === 'category' || lowerKey === 'cat') {
+      normalized.category = body[key];
+    } else if (lowerKey === 'sum' || lowerKey === 'amount') {
+      normalized.sum = body[key];
+    } else if (lowerKey === 'createdat' || lowerKey === 'createddate' || lowerKey === 'date') {
+      normalized.createdAt = body[key];
+    } else {
+      normalized[key] = body[key];
+    }
+  }
+  return normalized;
+};
+
 app.post('/api/add', async (request, response) => {
   try {
-    const { description, category, userId, userid, sum, createdAt } = request.body;
-    const finalUserId = userId !== undefined ? userId : userid;
+    const normalizedBody = normalizeRequestBody(request.body);
+    const { description, category, userId, sum, createdAt } = normalizedBody;
     
-    const targetUser = await User.findOne({ id: finalUserId });
+    const targetUser = await User.findOne({ id: userId });
     if (!targetUser) {
       return response.status(400).json({ id: 'error', message: 'User does not exist' });
     }
@@ -43,7 +72,7 @@ app.post('/api/add', async (request, response) => {
       }
     }
     
-    const newCostEntry = new Cost({ description, category, userId: finalUserId, sum, createdAt: costTimestamp });
+    const newCostEntry = new Cost({ description, category, userId, sum, createdAt: costTimestamp });
     await newCostEntry.save();
     
     response.json(newCostEntry);
