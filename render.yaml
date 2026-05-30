@@ -1,11 +1,14 @@
 services:
-  # 1. Ephemeral MongoDB (Private Service - secure and bypasses HTTP health checks)
-  - type: pserv
+  # 1. Ephemeral MongoDB (Web Service using PORT env var for health check routing)
+  - type: web
     name: mongodb
     runtime: image
     image:
       url: "mongo:4.4"
     plan: free
+    envVars:
+      - key: PORT
+        value: "27017"
 
   # 2. Users Microservice (Seeds the DB automatically on start!)
   - type: web
@@ -16,14 +19,11 @@ services:
     envVars:
       - key: MONGODB_HOST
         fromService:
-          type: pserv
+          type: web
           name: mongodb
           property: host
       - key: MONGODB_PORT
-        fromService:
-          type: pserv
-          name: mongodb
-          property: port
+        value: "27017"
 
   # 3. Logs Microservice
   - type: web
@@ -34,14 +34,11 @@ services:
     envVars:
       - key: MONGODB_HOST
         fromService:
-          type: pserv
+          type: web
           name: mongodb
           property: host
       - key: MONGODB_PORT
-        fromService:
-          type: pserv
-          name: mongodb
-          property: port
+        value: "27017"
 
   # 4. Costs Microservice
   - type: web
@@ -52,14 +49,11 @@ services:
     envVars:
       - key: MONGODB_HOST
         fromService:
-          type: pserv
+          type: web
           name: mongodb
           property: host
       - key: MONGODB_PORT
-        fromService:
-          type: pserv
-          name: mongodb
-          property: port
+        value: "27017"
 
   # 5. About Microservice
   - type: web
@@ -70,14 +64,11 @@ services:
     envVars:
       - key: MONGODB_HOST
         fromService:
-          type: pserv
+          type: web
           name: mongodb
           property: host
       - key: MONGODB_PORT
-        fromService:
-          type: pserv
-          name: mongodb
-          property: port
+        value: "27017"
 
   # 6. Nginx-based Frontend UI
   - type: web
