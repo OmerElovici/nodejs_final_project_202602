@@ -20,10 +20,10 @@ echo "Running seed script..."
 node seed.js
 
 echo "Starting Node APIs..."
-node logs-service.js &
-node users-service.js &
-node costs-service.js &
-node about-service.js &
+node logs_service.js &
+node users_service.js &
+node costs_service.js &
+node about_service.js &
 
 # Wait for background processes to keep the container running
 wait
