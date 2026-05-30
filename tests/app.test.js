@@ -167,6 +167,21 @@ describe('Cost Manager API - Comprehensive Tests', () => {
       expect(res.body.sum).toEqual(8);
     });
 
+    it('should add a cost item successfully with lowercase userid', async () => {
+      const res = await request(costsApp)
+        .post('/api/add')
+        .send({
+          description: 'milk 9',
+          category: 'food',
+          userid: 123123,
+          sum: 8
+        });
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.description).toEqual('milk 9');
+      expect(res.body.sum).toEqual(8);
+      expect(res.body.userId).toEqual(123123);
+    });
+
     it('should add another cost item to test grouping', async () => {
       const res = await request(costsApp)
         .post('/api/add')
@@ -183,7 +198,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
       const res = await request(usersApp)
         .get('/api/users/123123');
       expect(res.statusCode).toEqual(200);
-      expect(res.body.total).toEqual(20);
+      expect(res.body.total).toEqual(28);
     });
 
     it('should fail to get a report with missing parameters', async () => {
@@ -207,7 +222,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
       
       const foodCategory = res.body.costs.find(c => c.food);
       expect(foodCategory).toBeDefined();
-      expect(foodCategory.food.length).toEqual(2);
+      expect(foodCategory.food.length).toEqual(3);
       
       const healthCategory = res.body.costs.find(c => c.health);
       expect(healthCategory).toBeDefined();
@@ -219,7 +234,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         .get('/api/costs');
       expect(res.statusCode).toEqual(200);
       expect(Array.isArray(res.body)).toBeTruthy();
-      expect(res.body.length).toEqual(2);
+      expect(res.body.length).toEqual(3);
     });
 
     it('should list all reports', async () => {

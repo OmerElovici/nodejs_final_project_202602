@@ -21,9 +21,10 @@ app.use(loggerMiddleware);
  */
 app.post('/api/add', async (request, response) => {
   try {
-    const { description, category, userId, sum, createdAt } = request.body;
+    const { description, category, userId, userid, sum, createdAt } = request.body;
+    const finalUserId = userId !== undefined ? userId : userid;
     
-    const targetUser = await User.findOne({ id: userId });
+    const targetUser = await User.findOne({ id: finalUserId });
     if (!targetUser) {
       return response.status(400).json({ id: 'error', message: 'User does not exist' });
     }
@@ -42,7 +43,7 @@ app.post('/api/add', async (request, response) => {
       }
     }
     
-    const newCostEntry = new Cost({ description, category, userId, sum, createdAt: costTimestamp });
+    const newCostEntry = new Cost({ description, category, userId: finalUserId, sum, createdAt: costTimestamp });
     await newCostEntry.save();
     
     response.json(newCostEntry);
