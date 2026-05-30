@@ -1,0 +1,31 @@
+FROM mongo:4.4
+
+# Install Nginx, curl, and Node.js 20.x
+RUN apt-get update && apt-get install -y curl nginx && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# Setup Node.js app
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install --production
+
+# Copy backend files
+COPY . .
+
+# Setup frontend files and custom Nginx config
+RUN rm -rf /var/www/html/* && cp -r ui/* /var/www/html/
+COPY nginx.conf /etc/nginx/sites-available/default
+
+# Ensure start script is executable
+RUN chmod +x start-all-in-one.sh
+
+# Environment variables
+ENV MONGODB_URI=mongodb://127.0.0.1:27017/cost-manager
+
+# Expose Nginx port (80) and all API ports
+EXPOSE 80 3001 3002 3003 3004
+
+# Run our all-in-one entrypoint script
+CMD ["./start-all-in-one.sh"]

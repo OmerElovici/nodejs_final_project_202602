@@ -1,8 +1,8 @@
 const BASE_URLS = {
-    logs: 'http://localhost:3001',
-    users: 'http://localhost:3002',
-    costs: 'http://localhost:3003',
-    about: 'http://localhost:3004'
+    logs: '/logs',
+    users: '/users',
+    costs: '/costs',
+    about: '/about'
 };
 
 const output = document.getElementById('responseOutput');

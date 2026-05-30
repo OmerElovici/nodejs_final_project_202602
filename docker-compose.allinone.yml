@@ -1,0 +1,12 @@
+services:
+  cost-manager-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.allinone
+    container_name: cost-manager-all-in-one
+    ports:
+      - "8080:80"     # UI
+      - "3001:3001"   # Logs API
+      - "3002:3002"   # Users API
+      - "3003:3003"   # Costs API
+      - "3004:3004"   # About API
