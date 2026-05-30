@@ -1,12 +1,14 @@
 services:
-  # 1. Ephemeral MongoDB (Web Service with a runtime netcat HTTP health check sidecar)
+  # 1. Ephemeral MongoDB (Web Service using PORT env var for health check routing)
   - type: web
     name: mongodb
     runtime: image
     image:
       url: "mongo:4.4"
     plan: free
-    dockerCommand: "apt-get update && apt-get install -y netcat && (while true; do echo -e 'HTTP/1.1 200 OK\\r\\nContent-Length: 2\\r\\n\\r\\nOK' | nc -l -p 10000; done) & mongod --bind_ip_all"
+    envVars:
+      - key: PORT
+        value: "27017"
 
   # 2. Users Microservice (Seeds the DB automatically on start!)
   - type: web
