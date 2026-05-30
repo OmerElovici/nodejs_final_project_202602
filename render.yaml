@@ -1,6 +1,6 @@
 services:
-  # 1. Ephemeral MongoDB (Web Service from prebuilt image)
-  - type: web
+  # 1. Ephemeral MongoDB (Private Service - secure and bypasses HTTP health checks)
+  - type: pserv
     name: mongodb
     runtime: image
     image:
@@ -16,12 +16,12 @@ services:
     envVars:
       - key: MONGODB_HOST
         fromService:
-          type: web
+          type: pserv
           name: mongodb
           property: host
       - key: MONGODB_PORT
         fromService:
-          type: web
+          type: pserv
           name: mongodb
           property: port
 
@@ -34,12 +34,12 @@ services:
     envVars:
       - key: MONGODB_HOST
         fromService:
-          type: web
+          type: pserv
           name: mongodb
           property: host
       - key: MONGODB_PORT
         fromService:
-          type: web
+          type: pserv
           name: mongodb
           property: port
 
@@ -52,12 +52,12 @@ services:
     envVars:
       - key: MONGODB_HOST
         fromService:
-          type: web
+          type: pserv
           name: mongodb
           property: host
       - key: MONGODB_PORT
         fromService:
-          type: web
+          type: pserv
           name: mongodb
           property: port
 
@@ -70,12 +70,12 @@ services:
     envVars:
       - key: MONGODB_HOST
         fromService:
-          type: web
+          type: pserv
           name: mongodb
           property: host
       - key: MONGODB_PORT
         fromService:
-          type: web
+          type: pserv
           name: mongodb
           property: port
 
