@@ -1,0 +1,55 @@
+services:
+  # 1. Ephemeral MongoDB (No Persistent Disk)
+  - type: pserv
+    name: mongodb
+    runtime: image
+    image: mongo:4.4
+    plan: free
+
+  # 2. Users Microservice (Seeds the DB automatically on start!)
+  - type: web
+    name: users-service
+    runtime: docker
+    dockerCommand: node seed.js && node users_service.js
+    plan: free
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb://mongodb:27017/cost-manager
+
+  # 3. Logs Microservice
+  - type: web
+    name: logs-service
+    runtime: docker
+    dockerCommand: node logs_service.js
+    plan: free
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb://mongodb:27017/cost-manager
+
+  # 4. Costs Microservice
+  - type: web
+    name: costs-service
+    runtime: docker
+    dockerCommand: node costs_service.js
+    plan: free
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb://mongodb:27017/cost-manager
+
+  # 5. About Microservice
+  - type: web
+    name: about-service
+    runtime: docker
+    dockerCommand: node about_service.js
+    plan: free
+    envVars:
+      - key: MONGODB_URI
+        value: mongodb://mongodb:27017/cost-manager
+
+  # 6. Nginx-based Frontend UI
+  - type: web
+    name: cost-manager-ui
+    runtime: docker
+    dockerContext: ./ui
+    dockerfilePath: ./ui/Dockerfile
+    plan: free
