@@ -23,7 +23,7 @@ services:
   logs-service:
     build: .
     container_name: logs-service
-    command: node logs-service.js
+    command: node logs_service.js
     ports:
       - "3001:3001"
     environment:
@@ -35,7 +35,7 @@ services:
   users-service:
     build: .
     container_name: users-service
-    command: node users-service.js
+    command: node users_service.js
     ports:
       - "3002:3002"
     environment:
@@ -47,7 +47,7 @@ services:
   costs-service:
     build: .
     container_name: costs-service
-    command: node costs-service.js
+    command: node costs_service.js
     ports:
       - "3003:3003"
     environment:
@@ -59,7 +59,7 @@ services:
   about-service:
     build: .
     container_name: about-service
-    command: node about-service.js
+    command: node about_service.js
     ports:
       - "3004:3004"
     environment:

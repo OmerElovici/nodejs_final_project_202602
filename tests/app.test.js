@@ -2,10 +2,10 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
-const logsApp = require('../logs-service');
-const usersApp = require('../users-service');
-const costsApp = require('../costs-service');
-const aboutApp = require('../about-service');
+const logsApp = require('../logs_service');
+const usersApp = require('../users_service');
+const costsApp = require('../costs_service');
+const aboutApp = require('../about_service');
 
 let mongoServer;
 
