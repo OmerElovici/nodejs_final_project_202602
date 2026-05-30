@@ -38,7 +38,6 @@ run_test("Get About Details", test_about)
 
 # 2. Test User Casing Normalization (kebab-case & UPPERCASE)
 def test_user_normalization():
-    # Adding a test user with non-standard casing (mix of UPPERCASE and kebab-case)
     url = f"{b}/api/add/"
     payload = {
         "ID": 987654,
@@ -47,7 +46,6 @@ def test_user_normalization():
         "birth-day": "1995-05-15"
     }
     res = requests.post(url, json=payload)
-    # The server might return 400 if user 987654 already exists, which is acceptable for repeat runs.
     if res.status_code == 400 and "duplicate" in res.text.lower():
         print(f"[\u001b[32mPASS\u001b[0m] 2. User Casing Normalization: User already exists, duplication handled correctly")
         return
@@ -132,7 +130,6 @@ def test_validation_missing_fields():
     payload = {
         "userId": 123123,
         "category": "food"
-        # missing description and sum
     }
     res = requests.post(url, json=payload)
     assert res.status_code == 400, f"Expected 400 for missing fields, got {res.status_code}"
@@ -145,7 +142,7 @@ def test_validation_invalid_category():
     payload = {
         "userId": 123123,
         "description": "invalid category test",
-        "category": "travel",  # not in ['food', 'health', 'housing', 'sports', 'education']
+        "category": "travel",
         "sum": 8
     }
     res = requests.post(url, json=payload)
@@ -161,7 +158,7 @@ def test_validation_past_date():
         "description": "past date test",
         "category": "food",
         "sum": 8,
-        "createdAt": "2000-01-01T00:00:00.000Z" # past date backdating blocked
+        "createdAt": "2000-01-01T00:00:00.000Z"
     }
     res = requests.post(url, json=payload)
     assert res.status_code == 400, f"Expected 400 for past date backdating, got {res.status_code}"
@@ -172,7 +169,7 @@ run_test("Validation: Backdating Prevention", test_validation_past_date)
 def test_validation_non_existent_user():
     url = f"{c}/api/add/"
     payload = {
-        "userId": 999999,  # user does not exist
+        "userId": 999999,
         "description": "ghost cost",
         "category": "food",
         "sum": 8
@@ -192,10 +189,9 @@ def test_empty_report():
     assert report["userId"] == 123123
     assert report["year"] == 2026
     assert report["month"] == 1
-    # January 2026 should be empty
     for cat_data in report["costs"]:
         for cat, items in cat_data.items():
-            assert len(items) == 0, f"Expected January category {cat} to be empty"
+            assert len(items) == 0
     print(f"[\u001b[32mPASS\u001b[0m] 5a. Computed Report: January 2026 report is empty as expected")
 
 run_test("Computed Report: Empty month", test_empty_report)
@@ -211,14 +207,13 @@ def test_populated_report():
     assert report["year"] == current_year
     assert report["month"] == current_month
     
-    # Verify that the items we added in this run (food, health, housing, sports) appear in the report
     categories_found = []
     for cat_data in report["costs"]:
         for cat, items in cat_data.items():
             if len(items) > 0:
                 categories_found.append(cat)
     
-    assert len(categories_found) > 0, "No cost items found in report for current month"
+    assert len(categories_found) > 0
     print(f"[\u001b[32mPASS\u001b[0m] 5b. Computed Report: Current month ({current_year}/{current_month}) contains the normalized costs: {categories_found}")
 
 run_test("Computed Report: Populated month", test_populated_report)
@@ -229,10 +224,73 @@ def test_logs():
     res = requests.get(url)
     assert res.status_code == 200
     logs = res.json()
-    assert isinstance(logs, list), "Logs endpoint did not return a list"
+    assert isinstance(logs, list)
     print(f"[\u001b[32mPASS\u001b[0m] 6. System Logs: Logs retrieved successfully. Total logs: {len(logs)}")
 
 run_test("System Logs Retrieval", test_logs)
+
+# ================= ADVANCED BOUNDARY & SECURITY TESTS =================
+
+# 7. Boundary Conditions: Missing Query Parameter in Report
+def test_missing_report_param():
+    url = f"{c}/api/report/?id=123123&month=1"  # missing 'year'
+    res = requests.get(url)
+    # Your integration tests explicitly expect a 500 status code for missing report parameters.
+    assert res.status_code == 500, f"Expected 500 for missing param, got {res.status_code}"
+    print(f"[\u001b[32mPASS\u001b[0m] 7. Boundary Case: Missing 'year' correctly returns 500")
+
+run_test("Report Parameter Boundary", test_missing_report_param)
+
+# 8. Type Safety: Non-numeric Sum in Cost payload
+def test_non_numeric_sum():
+    url = f"{c}/api/add/"
+    payload = {
+        "userId": 123123,
+        "description": "text sum test",
+        "category": "food",
+        "sum": "ten dollars"  # non-numeric string
+    }
+    res = requests.post(url, json=payload)
+    assert res.status_code == 400, f"Expected 400 for string sum, got {res.status_code}"
+    print(f"[\u001b[32mPASS\u001b[0m] 8. Type Safety: Non-numeric 'sum' string is safely rejected with 400")
+
+run_test("Type Safety: Non-numeric Sum", test_non_numeric_sum)
+
+# 9. CORS Policy check
+def test_cors_headers():
+    url = f"{d}/api/about/"
+    res = requests.get(url)
+    cors_header = res.headers.get("Access-Control-Allow-Origin", "")
+    assert cors_header == "*", f"Expected Access-Control-Allow-Origin: *, got '{cors_header}'"
+    print(f"[\u001b[32mPASS\u001b[0m] 9. CORS Policy: Access-Control-Allow-Origin: * header is present")
+
+run_test("CORS Header Verification", test_cors_headers)
+
+# 10. NoSQL Query Injection Block
+def test_nosql_injection():
+    url = f"{c}/api/add/"
+    payload = {
+        "userId": {"$ne": None},  # NoSQL injection attempt
+        "description": "NoSQL Injection Test",
+        "category": "food",
+        "sum": 10
+    }
+    res = requests.post(url, json=payload)
+    # The server should safely reject this query with 400 Bad Request
+    assert res.status_code == 400, f"Expected 400 for NoSQL injection, got {res.status_code}"
+    print(f"[\u001b[32mPASS\u001b[0m] 10. Security: NoSQL Operator Injection is safely blocked")
+
+run_test("Security: NoSQL Injection Block", test_nosql_injection)
+
+# 11. Wrong HTTP Method Safety
+def test_wrong_http_method():
+    url = f"{c}/api/add/"  # POST-only route
+    res = requests.get(url)
+    # Express will return a 404 for GET /api/add as it's not defined
+    assert res.status_code == 404, f"Expected 404 for GET on POST-only route, got {res.status_code}"
+    print(f"[\u001b[32mPASS\u001b[0m] 11. Endpoint Safety: GET on POST-only route correctly yields 404")
+
+run_test("Endpoint Safety: Wrong HTTP Method", test_wrong_http_method)
 
 print("\n==================================================")
 print("              TESTING SUITE COMPLETE              ")

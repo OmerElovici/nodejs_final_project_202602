@@ -96,6 +96,21 @@ describe('Cost Manager API - Comprehensive Tests', () => {
       expect(Array.isArray(res.body)).toBeTruthy();
       expect(res.body.length).toBeGreaterThan(0);
     });
+
+    it('should add a new user successfully with non-standard casing (UPPERCASE & kebab-case)', async () => {
+      const res = await request(usersApp)
+        .post('/api/add')
+        .send({
+          "ID": 987654,
+          "first-name": "Test",
+          "LAST_NAME": "User",
+          "birth-day": "1995-05-15"
+        });
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.id).toEqual(987654);
+      expect(res.body.firstName).toEqual('Test');
+      expect(res.body.lastName).toEqual('User');
+    });
   });
 
   describe('Costs Service', () => {
@@ -243,6 +258,65 @@ describe('Cost Manager API - Comprehensive Tests', () => {
       expect(res.statusCode).toEqual(200);
       expect(Array.isArray(res.body)).toBeTruthy();
     });
+
+    it('should add a cost item successfully with kebab-case keys (user-id, desc, amount)', async () => {
+      const res = await request(costsApp)
+        .post('/api/add')
+        .send({
+          "user-id": 123123,
+          "desc": "kebab-case test",
+          "category": "housing",
+          "amount": 250
+        });
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.userId).toEqual(123123);
+      expect(res.body.description).toEqual('kebab-case test');
+      expect(res.body.sum).toEqual(250);
+    });
+
+    it('should add a cost item successfully with snake_case keys (user_id, created_at)', async () => {
+      const res = await request(costsApp)
+        .post('/api/add')
+        .send({
+          "user_id": 123123,
+          "description": "snake_case test",
+          "category": "sports",
+          "sum": 45,
+          "created_at": new Date().toISOString()
+        });
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.userId).toEqual(123123);
+    });
+
+    it('should reject a cost item with a non-numeric sum', async () => {
+      const res = await request(costsApp)
+        .post('/api/add')
+        .send({
+          userId: 123123,
+          description: "text sum test",
+          category: "food",
+          sum: "ten dollars"
+        });
+      expect(res.statusCode).toEqual(400);
+    });
+
+    it('should reject a NoSQL query injection block in userId', async () => {
+      const res = await request(costsApp)
+        .post('/api/add')
+        .send({
+          userId: {"$ne": null},
+          description: "NoSQL Injection Test",
+          category: "food",
+          sum: 10
+        });
+      expect(res.statusCode).toEqual(400);
+    });
+
+    it('should fail with 404 for wrong HTTP method on add cost route', async () => {
+      const res = await request(costsApp)
+        .get('/api/add');
+      expect(res.statusCode).toEqual(404);
+    });
   });
 
   describe('Logs Service', () => {
@@ -264,6 +338,12 @@ describe('Cost Manager API - Comprehensive Tests', () => {
       expect(res.body[0].lastName).toEqual('Elovici');
       expect(res.body[1].firstName).toEqual('David');
       expect(res.body[1].lastName).toEqual('Yakhin');
+    });
+
+    it('should verify CORS header is present', async () => {
+      const res = await request(aboutApp)
+        .get('/api/about');
+      expect(res.headers['access-control-allow-origin']).toEqual('*');
     });
   });
 });
