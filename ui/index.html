@@ -3,148 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cost Manager Dashboard</title>
-    <!-- Modern Premium Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Cost Manager API Tester</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="glow-bg"></div>
     <div class="container">
-        <header>
-            <div class="logo-area">
-                <span class="logo-icon">📊</span>
-                <h1>CostManager <span class="logo-badge">Pro</span></h1>
-            </div>
-            <p class="subtitle">Distributed microservices orchestration for budget management and computed reports.</p>
-        </header>
+        <h1>Cost Manager API Tester</h1>
         
         <div class="grid">
-            <!-- Users Service Card -->
-            <div class="card glass-card">
-                <div class="card-header">
-                    <span class="service-icon">👤</span>
-                    <h2>Users Service <span class="port-badge">3002</span></h2>
-                </div>
+            <!-- Users Service -->
+            <div class="card">
+                <h2>Users Service (Port 3002)</h2>
                 
-                <div class="form-section">
-                    <h3>Add New User</h3>
-                    <form id="addUserForm">
-                        <div class="form-row">
-                            <input type="number" id="userId" placeholder="User ID (e.g. 123)">
-                            <input type="text" id="userFirstName" placeholder="First Name">
-                        </div>
-                        <div class="form-row">
-                            <input type="text" id="userLastName" placeholder="Last Name">
-                            <input type="date" id="userBirthday" title="Birthday">
-                        </div>
-                        <button type="submit" class="btn-primary">Add User</button>
-                    </form>
-                </div>
+                <h3>Add User</h3>
+                <form id="addUserForm">
+                    <input type="number" id="userId" placeholder="ID" required>
+                    <input type="text" id="userFirstName" placeholder="First Name" required>
+                    <input type="text" id="userLastName" placeholder="Last Name" required>
+                    <input type="date" id="userBirthday" required>
+                    <button type="submit">Add User</button>
+                </form>
 
-                <div class="form-section">
-                    <h3>Get User Profile & Total Spent</h3>
-                    <form id="getUserForm">
-                        <div class="input-group">
-                            <input type="number" id="getUserId" placeholder="Enter User ID">
-                            <button type="submit" class="btn-secondary">Query Profile</button>
-                        </div>
-                    </form>
-                </div>
+                <h3>Get User Details</h3>
+                <form id="getUserForm">
+                    <input type="number" id="getUserId" placeholder="User ID" required>
+                    <button type="submit">Get User</button>
+                </form>
 
-                <div class="action-section">
-                    <button id="listUsersBtn" class="btn-outline">List All Registered Users</button>
-                </div>
+                <h3>List All Users</h3>
+                <button id="listUsersBtn">Get All Users</button>
             </div>
 
-            <!-- Costs Service Card -->
-            <div class="card glass-card">
-                <div class="card-header">
-                    <span class="service-icon">💳</span>
-                    <h2>Costs Service <span class="port-badge">3003</span></h2>
-                </div>
+            <!-- Costs Service -->
+            <div class="card">
+                <h2>Costs Service (Port 3003)</h2>
                 
-                <div class="form-section">
-                    <h3>Add Cost Transaction</h3>
-                    <form id="addCostForm">
-                        <div class="form-row">
-                            <input type="number" id="costUserId" placeholder="User ID">
-                            <input type="text" id="costDesc" placeholder="Description (e.g. milk)">
-                        </div>
-                        <div class="form-row">
-                            <select id="costCategory">
-                                <option value="" disabled selected>Select Category</option>
-                                <option value="food">Food</option>
-                                <option value="health">Health</option>
-                                <option value="housing">Housing</option>
-                                <option value="sports">Sports</option>
-                                <option value="education">Education</option>
-                            </select>
-                            <input type="number" id="costSum" placeholder="Amount / Sum">
-                        </div>
-                        <button type="submit" class="btn-primary">Record Purchase</button>
-                    </form>
-                </div>
+                <h3>Add Purchase</h3>
+                <form id="addCostForm">
+                    <input type="number" id="costUserId" placeholder="User ID" required>
+                    <input type="text" id="costDesc" placeholder="Description" required>
+                    <select id="costCategory" required>
+                        <option value="food">Food</option>
+                        <option value="health">Health</option>
+                        <option value="housing">Housing</option>
+                        <option value="sports">Sports</option>
+                        <option value="education">Education</option>
+                    </select>
+                    <input type="number" id="costSum" placeholder="Sum" required>
+                    <button type="submit">Add Purchase</button>
+                </form>
 
-                <div class="form-section">
-                    <h3>Generate Monthly Report</h3>
-                    <form id="getReportForm">
-                        <div class="form-row">
-                            <input type="number" id="reportUserId" placeholder="User ID">
-                            <input type="number" id="reportYear" placeholder="Year (e.g. 2026)">
-                        </div>
-                        <div class="form-row">
-                            <input type="number" id="reportMonth" placeholder="Month (1-12)">
-                            <button type="submit" class="btn-secondary">Get Report</button>
-                        </div>
-                    </form>
-                </div>
+                <h3>List All Purchases</h3>
+                <button id="listCostsBtn">Get All Purchases</button>
 
-                <div class="action-row">
-                    <button id="listCostsBtn" class="btn-outline">All Purchases</button>
-                    <button id="listReportsBtn" class="btn-outline">All Cached Reports</button>
-                </div>
+                <h3>Create Monthly Report</h3>
+                <form id="getReportForm">
+                    <input type="number" id="reportUserId" placeholder="User ID" required>
+                    <input type="number" id="reportYear" placeholder="Year (e.g. 2026)" required>
+                    <input type="number" id="reportMonth" placeholder="Month (1-12)" required>
+                    <button type="submit">Create Report</button>
+                </form>
+
+                <h3>List All Reports</h3>
+                <button id="listReportsBtn">Get All Reports</button>
             </div>
 
-            <!-- System Services Card -->
-            <div class="card glass-card system-card">
-                <div class="card-header">
-                    <span class="service-icon">⚙️</span>
-                    <h2>System Control Room</h2>
-                </div>
-                
-                <div class="system-section">
-                    <div class="service-status">
-                        <h3>Logs Service <span class="port-badge">3001</span></h3>
-                        <p class="service-desc">Monitors API accesses and records requests database logs.</p>
-                        <button id="getLogsBtn" class="btn-primary">View Database Logs</button>
-                    </div>
-                    
-                    <div class="service-status">
-                        <h3>About Service <span class="port-badge">3004</span></h3>
-                        <p class="service-desc">Returns team details and service definitions.</p>
-                        <button id="getAboutBtn" class="btn-secondary">View Team Details</button>
-                    </div>
-                </div>
+            <!-- Logs & About Services -->
+            <div class="card">
+                <h2>Logs Service (Port 3001)</h2>
+                <button id="getLogsBtn">Get All Logs</button>
+
+                <h2 style="margin-top: 2rem;">About Service (Port 3004)</h2>
+                <button id="getAboutBtn">Get team members</button>
             </div>
         </div>
 
-        <!-- Dynamic Output Console -->
-        <div class="console-wrapper">
-            <div class="console-header">
-                <div class="console-dots">
-                    <span class="dot red"></span>
-                    <span class="dot yellow"></span>
-                    <span class="dot green"></span>
-                </div>
-                <div class="console-title">output_stream.json</div>
-                <button id="clearConsoleBtn" class="btn-clear">Clear</button>
-            </div>
-            <div class="response-container">
-                <pre id="responseOutput">System initialized. Awaiting API request...</pre>
-            </div>
+        <div class="response-container">
+            <h2>Response</h2>
+            <pre id="responseOutput">Response will appear here...</pre>
         </div>
     </div>
     <script src="app.js"></script>
