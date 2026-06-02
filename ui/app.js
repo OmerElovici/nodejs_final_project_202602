@@ -1,3 +1,4 @@
+// Configured base paths for Nginx proxy routing.
 const BASE_URLS = {
     logs: '/logs',
     users: '/users',
@@ -5,59 +6,90 @@ const BASE_URLS = {
     about: '/about'
 };
 
+// DOM hook to render the JSON logs.
 const output = document.getElementById('responseOutput');
 
 /**
- * Displays the JSON response from the server in the output area.
+ * Renders JSON responses in the terminal simulation container.
  * @function displayResponse
  * @param {Object} responseData - The data object to display.
+ * @param {boolean} [isError=false] - Flag indicating error state.
  */
-const displayResponse = (responseData) => {
-    output.textContent = JSON.stringify(responseData, null, 2);
+const displayResponse = (responseData, isError = false) => {
+    // Stringify JSON with standard indentation format.
+    const outputString = JSON.stringify(responseData, null, 2);
+    // Assign formatted text output to terminal area.
+    output.textContent = outputString;
+    
+    // Toggle class names to style success and error colors.
+    if (isError) {
+        // Set text class to red.
+        output.className = 'console-error';
+    } else {
+        // Set text class to green.
+        output.className = 'console-success';
+    }
 };
 
 /**
- * Displays an error message in the output area.
+ * Formats caught JavaScript execution errors to screen.
  * @function displayError
- * @param {Error} requestError - The error object to display.
+ * @param {Error} requestError - The caught error object.
  */
 const displayError = (requestError) => {
-    output.textContent = `Error: ${requestError.message}`;
+    // Output error message to screen logs.
+    output.textContent = `Execution Error: ${requestError.message}`;
+    // Assign error styling classes.
+    output.className = 'console-error';
 };
 
 /**
- * Helper function to perform fetch requests to the backend services.
- * Handles loading state and error reporting.
+ * Handles core fetch requests and logs state changes.
  * @async
  * @function makeRequest
- * @param {string} requestUrl - The full URL for the request.
- * @param {Object} [fetchOptions={}] - Optional fetch configuration.
+ * @param {string} requestUrl - Target HTTP destination endpoint.
+ * @param {Object} [fetchOptions={}] - Optional request options configuration.
  */
 async function makeRequest(requestUrl, fetchOptions = {}) {
     try {
-        output.textContent = 'Loading...';
+        // Render loading state before triggering call.
+        output.textContent = 'Executing request...\nLoading data stream...';
+        // Assign purple console indicator.
+        output.className = 'console-info';
         
+        // Execute request.
         const fetchResult = await fetch(requestUrl, fetchOptions);
+        // Try parsing JSON payload.
         const resultJson = await fetchResult.json();
         
-        displayResponse(resultJson);
+        // Check if response code indicates failure.
+        if (!fetchResult.ok) {
+            // Log response details with error flag enabled.
+            displayResponse(resultJson, true);
+        } else {
+            // Log response details.
+            displayResponse(resultJson, false);
+        }
     } catch (executionError) {
+        // Report exceptions to display area.
         displayError(executionError);
     }
 }
 
-// --- Users Service Event Handlers ---
-
+// Add user registration form submit listener.
 document.getElementById('addUserForm').addEventListener('submit', (event) => {
+    // Block standard page refresh behavior.
     event.preventDefault();
     
+    // Build user payload object.
     const userData = {
-        id: Number(document.getElementById('userId').value),
+        id: document.getElementById('userId').value,
         firstName: document.getElementById('userFirstName').value,
         lastName: document.getElementById('userLastName').value,
         birthday: document.getElementById('userBirthday').value
     };
     
+    // Dispatch request to users endpoint.
     makeRequest(`${BASE_URLS.users}/api/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,29 +97,37 @@ document.getElementById('addUserForm').addEventListener('submit', (event) => {
     });
 });
 
+// Single user profile query form submit listener.
 document.getElementById('getUserForm').addEventListener('submit', (event) => {
+    // Block standard page refresh behavior.
     event.preventDefault();
     
+    // Fetch entered user search identifier.
     const searchId = document.getElementById('getUserId').value;
+    // Dispatch search query to API.
     makeRequest(`${BASE_URLS.users}/api/users/${searchId}`);
 });
 
+// Bulk user retrieval button action listener.
 document.getElementById('listUsersBtn').addEventListener('click', () => {
+    // Request registered user list.
     makeRequest(`${BASE_URLS.users}/api/users`);
 });
 
-// --- Costs Service Event Handlers ---
-
+// Cost entry creation form submit listener.
 document.getElementById('addCostForm').addEventListener('submit', (event) => {
+    // Block standard page refresh behavior.
     event.preventDefault();
     
+    // Compile cost data properties.
     const costRecord = {
-        userId: Number(document.getElementById('costUserId').value),
+        userId: document.getElementById('costUserId').value,
         description: document.getElementById('costDesc').value,
         category: document.getElementById('costCategory').value,
-        sum: Number(document.getElementById('costSum').value)
+        sum: document.getElementById('costSum').value
     };
     
+    // Post new purchase object details.
     makeRequest(`${BASE_URLS.costs}/api/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,31 +135,50 @@ document.getElementById('addCostForm').addEventListener('submit', (event) => {
     });
 });
 
+// Monthly expense report generation form submit listener.
 document.getElementById('getReportForm').addEventListener('submit', (event) => {
+    // Block standard page refresh behavior.
     event.preventDefault();
     
+    // Fetch query details.
     const reportUserId = document.getElementById('reportUserId').value;
     const reportYear = document.getElementById('reportYear').value;
     const reportMonth = document.getElementById('reportMonth').value;
     
+    // Build query argument line.
     const reportQuery = `id=${reportUserId}&year=${reportYear}&month=${reportMonth}`;
+    // Dispatch search query arguments to API.
     makeRequest(`${BASE_URLS.costs}/api/report?${reportQuery}`);
 });
 
+// Purchase lists query trigger.
 document.getElementById('listCostsBtn').addEventListener('click', () => {
+    // Pull full history of payments.
     makeRequest(`${BASE_URLS.costs}/api/costs`);
 });
 
+// Cache report records request trigger.
 document.getElementById('listReportsBtn').addEventListener('click', () => {
+    // Fetch all pre-computed cached reports.
     makeRequest(`${BASE_URLS.costs}/api/reports`);
 });
 
-// --- Logs & About Service Event Handlers ---
-
+// Global logs monitoring trigger.
 document.getElementById('getLogsBtn').addEventListener('click', () => {
+    // Fetch all logger database entries.
     makeRequest(`${BASE_URLS.logs}/api/logs`);
 });
 
+// General team identity query trigger.
 document.getElementById('getAboutBtn').addEventListener('click', () => {
+    // Call administrative about details.
     makeRequest(`${BASE_URLS.about}/api/about`);
+});
+
+// Console reset action button listener.
+document.getElementById('clearConsoleBtn').addEventListener('click', () => {
+    // Set terminal output text back to default instruction message.
+    output.textContent = 'System log cleared. Awaiting API instruction...';
+    // Clear custom color formatting style class.
+    output.className = '';
 });

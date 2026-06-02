@@ -46,6 +46,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         });
       expect(res.statusCode).toEqual(400);
       expect(res.body.id).toEqual('error');
+      expect(res.body.message).toEqual('lastName is required');
     });
 
     it('should fail to add a user with a duplicate ID', async () => {
@@ -59,6 +60,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         });
       expect(res.statusCode).toEqual(400);
       expect(res.body.id).toEqual('error');
+      expect(res.body.message).toEqual('User ID already exists');
     });
 
     it('should fail to add a user with invalid data types', async () => {
@@ -72,6 +74,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         });
       expect(res.statusCode).toEqual(400);
       expect(res.body.id).toEqual('error');
+      expect(res.body.message).toEqual('id must be a number');
     });
 
     it('should get user details and calculate total costs', async () => {
@@ -138,6 +141,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         });
       expect(res.statusCode).toEqual(400);
       expect(res.body.id).toEqual('error');
+      expect(res.body.message).toEqual('description is required');
     });
 
     it('should fail to add a cost with an invalid category', async () => {
@@ -151,6 +155,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
         });
       expect(res.statusCode).toEqual(400);
       expect(res.body.id).toEqual('error');
+      expect(res.body.message).toEqual('category must be one of: food, health, housing, sports, education');
     });
 
     it('should fail to add a cost with a past date', async () => {
@@ -219,7 +224,7 @@ describe('Cost Manager API - Comprehensive Tests', () => {
     it('should fail to get a report with missing parameters', async () => {
       const res = await request(costsApp)
         .get('/api/report?id=123123&month=1');
-      expect(res.statusCode).toEqual(500);
+      expect(res.statusCode).toEqual(400);
       expect(res.body.id).toEqual('error');
     });
 
@@ -298,6 +303,20 @@ describe('Cost Manager API - Comprehensive Tests', () => {
           sum: "ten dollars"
         });
       expect(res.statusCode).toEqual(400);
+      expect(res.body.message).toEqual('sum must be a number');
+    });
+
+    it('should reject a cost item with a negative sum', async () => {
+      const res = await request(costsApp)
+        .post('/api/add')
+        .send({
+          userId: 123123,
+          description: "negative sum test",
+          category: "food",
+          sum: -5
+        });
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.message).toEqual('cost cannot be negetive number');
     });
 
     it('should reject a NoSQL query injection block in userId', async () => {
