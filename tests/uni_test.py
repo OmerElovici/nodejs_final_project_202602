@@ -88,3 +88,116 @@ except Exception as e:
  print(e)
 
 print("")
+
+print("testing adding user with missing birthday")
+print("-----------------------------------------")
+try:
+ url = b + "/api/add/"
+ data = requests.post(url,
+       json={'id': 999999, 'firstName': 'David', 'lastName': 'Yakhin'})
+ print("url=" + url)
+ print("data.status_code=" + str(data.status_code))
+ print(data.content)
+except Exception as e:
+ print("problem")
+ print(e)
+
+print("")
+print()
+
+print("testing adding cost item with negative sum")
+print("------------------------------------------")
+try:
+ url = c + "/api/add/"
+ data = requests.post(url,
+       json={'userid': 123123, 'description': 'negative item', 'category': 'food', 'sum': -10})
+ print("url=" + url)
+ print("data.status_code=" + str(data.status_code))
+ print(data.content)
+except Exception as e:
+ print("problem")
+ print(e)
+
+print("")
+print()
+
+print("testing adding cost item with invalid category")
+print("----------------------------------------------")
+try:
+ url = c + "/api/add/"
+ data = requests.post(url,
+       json={'userid': 123123, 'description': 'invalid category', 'category': 'invalid_cat', 'sum': 20})
+ print("url=" + url)
+ print("data.status_code=" + str(data.status_code))
+ print(data.content)
+except Exception as e:
+ print("problem")
+ print(e)
+
+print("")
+print()
+
+print("testing adding user with non-numeric ID")
+print("---------------------------------------")
+try:
+ url = b + "/api/add/"
+ data = requests.post(url,
+       json={'id': 'abc', 'firstName': 'David', 'lastName': 'Yakhin', 'birthday': '1990-01-01'})
+ print("url=" + url)
+ print("data.status_code=" + str(data.status_code))
+ print(data.content)
+except Exception as e:
+ print("problem")
+ print(e)
+
+print("")
+print()
+
+print("testing adding user with non-positive ID")
+print("----------------------------------------")
+try:
+ url = b + "/api/add/"
+ data = requests.post(url,
+       json={'id': -123, 'firstName': 'David', 'lastName': 'Yakhin', 'birthday': '1990-01-01'})
+ print("url=" + url)
+ print("data.status_code=" + str(data.status_code))
+ print(data.content)
+except Exception as e:
+ print("problem")
+ print(e)
+
+print("")
+print()
+
+print("testing adding cost item with non-numeric userId")
+print("------------------------------------------------")
+try:
+ url = c + "/api/add/"
+ data = requests.post(url,
+       json={'userid': 'abc', 'description': 'milk', 'category': 'food', 'sum': 10})
+ print("url=" + url)
+ print("data.status_code=" + str(data.status_code))
+ print(data.content)
+except Exception as e:
+ print("problem")
+ print(e)
+
+print("")
+print()
+
+print("testing adding cost item with non-positive userId")
+print("-------------------------------------------------")
+try:
+ url = c + "/api/add/"
+ data = requests.post(url,
+       json={'userid': -123, 'description': 'milk', 'category': 'food', 'sum': 10})
+ print("url=" + url)
+ print("data.status_code=" + str(data.status_code))
+ print(data.content)
+except Exception as e:
+ print("problem")
+ print(e)
+
+print("")
+
+
